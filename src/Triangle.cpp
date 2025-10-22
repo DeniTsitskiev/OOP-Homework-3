@@ -1,20 +1,74 @@
 #include "../include/Triangle.h"
 #include "../include/Point.h"
+#include <algorithm> // для std::copy
 
-//Конструктор квадрата без аргументов
+//Конструктор треугольника без аргументов
 Triangle::Triangle() : Figure("Triangle"){}
+
+//Конструктор копирования
+Triangle::Triangle(const Triangle& other) 
+    : Figure(other), //копируем базовый класс (name_fig)
+      points(new Point[3]) //выделяем новую память
+{
+    std::copy(other.points, other.points + 3, points);
+}
+
+//Конструктор перемещения
+Triangle::Triangle(Triangle&& other) noexcept 
+    : Figure(std::move(other)), //перемещаем базовый класс
+      points(other.points)      //забираем массив точек
+{
+    other.points = nullptr; //обнуляем у исходного объекта
+}
+
+//Оператор копирующего присваивания
+Triangle& Triangle::operator=(const Triangle& other) {
+    if (this != &other) { //защита от самоприсваивания
+        //Копируем базовый класс
+        Figure::operator=(other);
+        
+        //Копируем точки
+        std::copy(other.points, other.points + 3, points);
+    }
+    return *this;
+}
+
+//Оператор перемещающего присваивания
+Triangle& Triangle::operator=(Triangle&& other) noexcept {
+    if (this != &other) { //защита от самоприсваивания
+        //Освобождаем свои ресурсы
+        delete[] points;
+        
+        // Перемещаем базовый класс
+        Figure::operator=(std::move(other));
+        
+        // Забираем ресурсы у other
+        points = other.points;
+        other.points = nullptr; // обнуляем у исходного объекта
+    }
+    return *this;
+}
+
+//Оператор неравенства
+bool Triangle::operator!=(const Triangle& other) const {
+    return !(*this == other);
+}
 
 //Конструктор с именем фигуры
 Triangle::Triangle(std::string name) : Figure(name){}
 
-// Конструктор с initializer_list
+//Конструктор с initializer_list
 Triangle::Triangle(std::initializer_list<Point> pointList) : Figure("Triangle"){
         if (pointList.size() != 3) {
             throw std::invalid_argument("Triangle requires exactly 3 points");
         }
-        // Копируем точки из initializer_list в массив points
+        //Копируем точки из initializer_list в массив points
         std::copy(pointList.begin(), pointList.end(), points);
     }
+
+Figure* Triangle::clone() const {
+    return new Triangle(*this); //использует конструктор копирования
+}
 
 Point Triangle:: center_figure() const{
     double x_center {0}, y_center {0};
@@ -43,11 +97,11 @@ void Triangle:: read_figure(std::istream& is){
     
     for (int i = 0; i < 3; i++) {
         Point p;
-        is >> p;  // используем перегруженный operator>> для Point
+        is >> p;  //используем перегруженный operator>> для Point
         points[i] = p;
     }
 
-    // Проверяем, что ввод прошел успешно
+    //Проверяем, что ввод прошел успешно
     if (!is) {
         std::cout << "Ошибка ввода!" << std::endl;
     }

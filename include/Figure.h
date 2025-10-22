@@ -20,7 +20,8 @@ class Figure{
         virtual double area_figure() const = 0;
         //Виртуальный деструктор
         virtual ~Figure() = default;
-
+        // Виртуальный метод для клонирования
+        virtual Figure* clone() const = 0;
         //Перегрузка операторов
         friend std::ostream& operator<<(std::ostream& os, const Figure& figure);
         friend std::istream& operator<<(std::istream& is, Figure& figure);

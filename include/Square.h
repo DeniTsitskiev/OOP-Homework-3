@@ -1,7 +1,6 @@
 #ifndef SQUARE_H
 #define SQUARE_H
 
-
 #include <ostream>
 #include <string>
 #include "./Figure.h"
@@ -14,15 +13,30 @@ class Square: public Figure{
     public:
         //Конструкторы
         Square();
+
+        //Конструкторы копирования и перемещения
+        Square(const Square& other);                    //Конструктор копирования
+        Square(Square&& other) noexcept;                //Конструктор перемещения
+        
+        //Операторы присваивания
+        Square& operator=(const Square& other);         //Копирующее присваивание
+        Square& operator=(Square&& other) noexcept;     //Перемещающее присваивание
+
         Square(std::string name);
         Square(std::initializer_list<Point> pointList);     // Конструктор с initializer_list
+        
         //Функции из задания
         Point center_figure() const override;               //Поиск центра
         void write_figure(std::ostream& os) const override; //Меняет поток os, чтобы << выводил информацию о фигуре на экран
         void read_figure(std::istream& is) override;        //Меняет поток is, чтобы >> заполнил массив точек
         double area_figure() const override;                //Поиск площади
-        // Оператор сравнения
+
+        Figure* clone() const override;
+        
+        //Операторы сравнения
         bool operator==(const Square& other) const;
+        bool operator!=(const Square& other) const;
+        
         //Деструктор
         ~Square();
 };
